@@ -159,7 +159,7 @@ func writeBillTo(pdf *gopdf.GoPdf, to string) {
 			pdf.Br(15)
 		}
 	}
-	pdf.Br(64)
+	pdf.Br(46)
 }
 
 func writeHeaderRow(pdf *gopdf.GoPdf, amountOnly bool) {
