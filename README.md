@@ -1,122 +1,110 @@
-<img width="1200" alt="Invoice" src="https://github.com/maaslalani/nap/assets/42545625/16dae9d9-390c-49b6-aedd-3f882b17f57b">
+# Go PDF Invoice Generator
 
-# Invoice
+This repository is a modified version of the original [invoice](https://github.com/maaslalani/invoice), featuring extended functionality and support for use as a Go module.
 
-Generate invoices from the command line.
+## Features
 
-## Command Line Interface
-
-```bash
-invoice generate --from "Dream, Inc." --to "Imagine, Inc." \
-    --item "Rubber Duck" --quantity 2 --rate 25 \
-    --tax 0.13 --discount 0.15 \
-    --note "For debugging purposes."
-```
-
-<img src="https://vhs.charm.sh/vhs-66CMd4UQuXkuxX9djHUnGX.gif" width="600" />
-
-View the generated PDF at `invoice.pdf`, you can customize the output location
-with `--output`.
-
-```bash
-open invoice.pdf
-```
-
-<img width="574" alt="Example invoice" src="https://github.com/maaslalani/nap/assets/42545625/13153de2-dfa1-41e6-a18e-4d3a5cea5b74">
-
-### Environment
-
-Save repeated information with environment variables:
-
-```bash
-export INVOICE_LOGO=/path/to/image.png
-export INVOICE_FROM="Dream, Inc."
-export INVOICE_TO="Imagine, Inc."
-export INVOICE_TAX=0.13
-export INVOICE_RATE=25
-```
-
-Generate new invoice:
-
-```bash
-invoice generate \
-    --item "Yellow Rubber Duck" --quantity 5 \
-    --item "Special Edition Plaid Rubber Duck" --quantity 1 \
-    --note "For debugging purposes." \
-    --output duck-invoice.pdf
-```
-
-### Configuration File
-
-Or, save repeated information with JSON / YAML:
-
-```json
-{
-    "logo": "/path/to/image.png",
-    "from": "Dream, Inc.",
-    "to": "Imagine, Inc.",
-    "tax": 0.13,
-    "items": ["Yellow Rubber Duck", "Special Edition Plaid Rubber Duck"],
-    "quantities": [5, 1],
-    "rates": [25, 25],
-}
-```
-
-Generate new invoice by importing the configuration file:
-
-```bash
-invoice generate --import path/to/data.json \
-    --output duck-invoice.pdf
-```
-
-### Custom Templates
-
-If you would like a custom invoice template for your business or company, please
-reach out via:
-
-* [Email](mailto:maas@lalani.dev)
-* [Twitter](https://twitter.com/maaslalani)
+- **Module Support**: Easily integrate the invoice generator into your Go projects.
+- **Enhanced Customization**: More options for customizing the appearance and content of invoices.
+- **Multi-language Support**: Generate invoices in multiple languages.
+- **Flexible Currency Handling**: Improved currency formatting and handling.
+- **Additional Payment Methods**: Support for more payment methods.
+- **Extended Metadata**: Include more detailed metadata in your invoices.
+- **Optimized for Performance**: Improved performance and reduced dependencies.
 
 ## Installation
 
-<!--
-
-Use a package manager:
+To install the module, use:
 
 ```bash
-# macOS
-brew install invoice
-
-# Arch
-yay -S invoice
-
-# Nix
-nix-env -iA nixpkgs.invoice
+go get github.com/m0uka/golang-pdf-invoice-generator
 ```
 
--->
+Import it in your Go project:
 
-Install with Go:
-
-```sh
-go install github.com/maaslalani/invoice@main
+```go
+import "github.com/m0uka/golang-pdf-invoice-generator/invoicepdf"
 ```
 
-Or download a binary from the [releases](https://github.com/maaslalani/invoice/releases).
+## Usage
+
+### Basic Example
+
+Here is a basic example of how to generate an invoice:
+
+```go
+package main
+
+import (
+    "log"
+    "github.com/m0uka/golang-pdf-invoice-generator/invoicepdf"
+    "os"
+    "bytes"
+)
+
+func main() {
+    invoice := invoicepdf.Invoice{
+        Id:     "12345",
+        Number: "INV-1001",
+        Title:  "Invoice Title",
+        LogoUrl: "http://example.com/logo.png",
+        From: invoicepdf.InvoiceCompany{
+            Name:         "Your Company Name",
+            AddressLine1: "Your Company Address Line 1",
+            AddressLine2: "Your Company Address Line 2",
+            City:         "Your City",
+            Country:      "Your Country",
+            State:        "Your State",
+            PostalCode:   "123456",
+            TaxID:        "TAX123456",
+            Email:        "info@yourcompany.com",
+            Website:      "https://yourcompany.com",
+        },
+        To: invoicepdf.InvoiceCompany{
+            Name:         "Customer Name",
+            AddressLine1: "Customer Address Line 1",
+            AddressLine2: "Customer Address Line 2",
+            City:         "Customer City",
+            Country:      "Customer Country",
+            State:        "Customer State",
+            PostalCode:   "654321",
+            TaxID:        "CUST123456",
+            Email:        "customer@example.com",
+            Website:      "https://customerwebsite.com",
+        },
+        Date:       "2024-07-11",
+        Due:        "2024-07-25",
+        Items:      []string{"Product 1", "Product 2"},
+        Quantities: []int{2, 1},
+        Rates:      []float64{50.0, 75.0},
+        Tax:        10.0,
+        Discount:   5.0,
+        Currency:   "USD",
+        Note:       "Thank you for your business.",
+        HeaderNote: "Invoice Header Note",
+    }
+
+    buffer, err := invoicepdf.GenerateInvoice(&invoice)
+    if err != nil {
+        log.Fatalf("Could not generate invoice: %v", err)
+    }
+
+    // Save buffer to file or handle it as needed
+    err = saveBufferToFile(buffer, "invoice.pdf")
+    if err != nil {
+        log.Fatalf("Could not save invoice: %v", err)
+    }
+}
+
+func saveBufferToFile(buffer *bytes.Buffer, filename string) error {
+    return os.WriteFile(filename, buffer.Bytes(), 0644)
+}
+```
+
+### Example Output
+
+![Example Invoice](example.png)
 
 ## License
 
-[MIT](https://github.com/maaslalani/invoice/blob/master/LICENSE)
-
-## Feedback
-
-I'd love to hear your feedback on improving `invoice`.
-
-Feel free to reach out via:
-* [Email](mailto:maas@lalani.dev)
-* [Twitter](https://twitter.com/maaslalani)
-* [GitHub issues](https://github.com/maaslalani/invoice/issues/new)
-
----
-
-<sub><sub>z</sub></sub><sub>z</sub>z
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

@@ -2,22 +2,18 @@ package main
 
 import (
 	_ "embed"
-	"github.com/maaslalani/invoice/invoicepdf"
-	"github.com/spf13/cobra"
+	"github.com/m0uka/golang-pdf-invoice-generator/invoicepdf"
 	"log"
+	"os"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "invoice",
-	Short: "Invoice generates invoices from the command line.",
-	Long:  `Invoice generates invoices from the command line.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return invoicepdf.GenerateInvoice(invoicepdf.DefaultInvoice())
-	},
-}
-
 func main() {
-	err := rootCmd.Execute()
+	buffer, err := invoicepdf.GenerateInvoice(invoicepdf.ExampleInvoice())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = os.WriteFile("test.pdf", buffer.Bytes(), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

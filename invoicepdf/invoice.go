@@ -39,7 +39,7 @@ type InvoiceCompany struct {
 	Website      string `json:"website"`
 }
 
-func DefaultInvoice() *Invoice {
+func ExampleInvoice() *Invoice {
 	return &Invoice{
 		Id:         "pn-payout-4we8a9ew6",
 		Number:     "1r56war4ea-1",

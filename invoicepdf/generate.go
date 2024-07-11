@@ -1,11 +1,11 @@
 package invoicepdf
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
-	"strings"
 )
 
 //go:embed "Inter/Inter Variable/Inter.ttf"
@@ -14,9 +14,7 @@ var interFont []byte
 //go:embed "Inter/Inter Hinted for Windows/Desktop/Inter-Bold.ttf"
 var interBoldFont []byte
 
-func GenerateInvoice(invoice *Invoice) error {
-	output := "test.pdf"
-
+func GenerateInvoice(invoice *Invoice) (*bytes.Buffer, error) {
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{
 		PageSize: *gopdf.PageSizeA4,
@@ -25,12 +23,12 @@ func GenerateInvoice(invoice *Invoice) error {
 	pdf.AddPage()
 	err := pdf.AddTTFFontData("Inter", interFont)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = pdf.AddTTFFontData("Inter-Bold", interBoldFont)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// This is nasty, but so is the rest of the library, soooo
@@ -38,7 +36,7 @@ func GenerateInvoice(invoice *Invoice) error {
 	to := fmt.Sprintf("%s\n%s\n%s\n%s, %s %s\n%s\n%s\n \n%s\n%s", invoice.To.Name, invoice.To.AddressLine1, invoice.To.AddressLine2, invoice.To.City, invoice.To.State, invoice.To.PostalCode, invoice.From.Country, invoice.To.TaxID, invoice.To.Email, invoice.To.Website)
 
 	if writeLogo(&pdf, invoice.LogoUrl, from, invoice.HeaderNote) != nil {
-		return errors.Wrap(err, "failed to call writeLogo")
+		return nil, errors.Wrap(err, "failed to call writeLogo")
 	}
 
 	writeTitle(&pdf, invoice.Title, invoice.Id, invoice.Date, invoice.Number)
@@ -67,13 +65,12 @@ func GenerateInvoice(invoice *Invoice) error {
 		writeDueDate(&pdf, invoice.Due)
 	}
 	writeFooter(&pdf, invoice.Id)
-	output = strings.TrimSuffix(output, ".pdf") + ".pdf"
-	err = pdf.WritePdf(output)
+
+	var buf bytes.Buffer
+	_, err = pdf.WriteTo(&buf)
 	if err != nil {
-		return err
+		return nil, errors.Wrap(err, "failed to call pdf.WriteTo")
 	}
 
-	fmt.Printf("Generated %s\n", output)
-
-	return nil
+	return &buf, nil
 }
