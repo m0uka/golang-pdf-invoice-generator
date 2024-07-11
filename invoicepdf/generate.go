@@ -35,6 +35,13 @@ func GenerateInvoice(invoice *Invoice) (*bytes.Buffer, error) {
 	from := fmt.Sprintf("%s\n%s\n%s\n%s, %s %s\n%s\n%s\n \n%s\n%s", invoice.From.Name, invoice.From.AddressLine1, invoice.From.AddressLine2, invoice.From.City, invoice.From.State, invoice.From.PostalCode, invoice.From.Country, invoice.From.TaxID, invoice.From.Email, invoice.From.Website)
 	to := fmt.Sprintf("%s\n%s\n%s\n%s, %s %s\n%s\n%s\n \n%s\n%s", invoice.To.Name, invoice.To.AddressLine1, invoice.To.AddressLine2, invoice.To.City, invoice.To.State, invoice.To.PostalCode, invoice.To.Country, invoice.To.TaxID, invoice.To.Email, invoice.To.Website)
 
+	if !invoice.From.Show {
+		from = "\n\n\n\n"
+	}
+	if !invoice.To.Show {
+		to = "\n\n\n\n"
+	}
+
 	if writeLogo(&pdf, invoice.LogoUrl, from, invoice.HeaderNote) != nil {
 		return nil, errors.Wrap(err, "failed to call writeLogo")
 	}
