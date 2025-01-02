@@ -20,6 +20,7 @@ type Invoice struct {
 
 	Tax      float64 `json:"tax" yaml:"tax"`
 	Discount float64 `json:"discount" yaml:"discount"`
+	Fees     float64 `json:"fees" yaml:"fees"`
 	Currency string  `json:"currency" yaml:"currency"`
 
 	Note       string `json:"note" yaml:"note"`

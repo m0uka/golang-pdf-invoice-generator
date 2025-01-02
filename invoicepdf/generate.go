@@ -67,7 +67,7 @@ func GenerateInvoice(invoice *Invoice) (*bytes.Buffer, error) {
 	if invoice.Note != "" {
 		writeNotes(&pdf, invoice.Note)
 	}
-	writeTotals(&pdf, subtotal, invoice.Tax, invoice.Discount, invoice.Currency)
+	writeTotals(&pdf, subtotal, invoice.Tax, invoice.Discount, invoice.Fees, invoice.Currency)
 	if invoice.Due != "" {
 		writeDueDate(&pdf, invoice.Due)
 	}

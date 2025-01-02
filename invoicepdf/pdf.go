@@ -23,6 +23,7 @@ const (
 const (
 	subtotalLabel = "Subtotal"
 	discountLabel = "Discount"
+	feeLabel      = "Fees"
 	taxLabel      = "Tax"
 	totalLabel    = "Total"
 )
@@ -227,7 +228,7 @@ func writeRow(pdf *gopdf.GoPdf, item string, quantity int, rate float64, currenc
 	pdf.Br(24)
 }
 
-func writeTotals(pdf *gopdf.GoPdf, subtotal float64, tax float64, discount float64, currency string) {
+func writeTotals(pdf *gopdf.GoPdf, subtotal float64, tax float64, discount float64, fees float64, currency string) {
 	pdf.SetY(600)
 
 	writeTotal(pdf, subtotalLabel, subtotal, currency)
@@ -235,7 +236,10 @@ func writeTotals(pdf *gopdf.GoPdf, subtotal float64, tax float64, discount float
 	if discount > 0 {
 		writeTotal(pdf, discountLabel, discount, currency)
 	}
-	writeTotal(pdf, totalLabel, subtotal+tax-discount, currency)
+	if fees > 0 {
+		writeTotal(pdf, feeLabel, fees, currency)
+	}
+	writeTotal(pdf, totalLabel, subtotal+tax-discount-fees, currency)
 }
 
 func writeTotal(pdf *gopdf.GoPdf, label string, total float64, currency string) {
